@@ -5,6 +5,8 @@ use Psalm\Config;
 use Psalm\Report;
 use Psalm\Internal\Analyzer\TaintNodeData;
 use function substr;
+use function basename;
+use function strlen;
 
 class ConsoleReport extends Report
 {
@@ -34,10 +36,12 @@ class ConsoleReport extends Report
         }
 
         $issue_reference = ' (see ' . $issue_data->link . ')';
+        $file_basename = basename($issue_data->file_name);
+        $file_path = substr($issue_data->file_name, 0, -strlen($file_basename));
 
         $issue_string .= ': ' . $issue_data->type
-            . ' - ' . $issue_data->file_name . ':' . $issue_data->line_from . ':' . $issue_data->column_from
-            . ' - ' . $issue_data->message . $issue_reference . "\n";
+            . ' - ' . $file_path . "\e[1;31m" . $file_basename . ':' . $issue_data->line_from . "\e[0m"
+            . ':' . $issue_data->column_from . ' - ' . $issue_data->message . $issue_reference . "\n";
 
 
         if ($issue_data->taint_trace) {
